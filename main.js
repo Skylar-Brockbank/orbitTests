@@ -93,7 +93,7 @@ function drawCircle(x,y,z,radius,faces){
   return line
 }
 
-
+// Central Disk Planets
 planetBank.push(new Planet(
   createPlanetMesh(1.5,64,64,"./planetTexture.png"),
   0,
@@ -102,7 +102,6 @@ planetBank.push(new Planet(
   {x:0,z:0},
   0.01
 ))
-
 planetBank.push(new Planet(
   createPlanetMesh(1,64,64,"./planetTexture.png"),
   0.8,
@@ -120,6 +119,8 @@ planetBank.push(new Planet(
   0.01,
   0
 ))
+
+//+1 planets
 
 for(let p in planetBank){
   scene.add(planetBank[p].mesh)
