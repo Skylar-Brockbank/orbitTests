@@ -1,8 +1,11 @@
 import './style.css'
+import planets from './planets'
 
 import * as tjs from "three"
 
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+
+var running=true;
 
 const scene = new tjs.Scene();
 const camera = new tjs.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);
@@ -17,10 +20,41 @@ const renderer = new tjs.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.set(100,50,0);
+camera.position.set(200,30,0);
 
 renderer.render(scene,camera);
 
+//simulation Controls
+const play = document.getElementById("play")
+const pause = document.getElementById("pause")
+
+pause.addEventListener("click",e=>{
+  running=false;
+})
+play.addEventListener("click",e=>{
+  running=true;
+  animate()
+})
+
+//key controls
+let movementConstant = 10
+window.addEventListener("keydown",e=>{
+  if(e.key=='ArrowUp'){
+    camera.position.x-=movementConstant
+  }else if(e.key=='ArrowDown'){
+    camera.position.x+=movementConstant
+  }else if(e.key=='ArrowLeft'){
+    camera.position.z-=movementConstant
+  }else if(e.key=='ArrowRight'){
+    camera.position.z+=movementConstant
+  }
+  else if(e.code=='Space'){
+    camera.position.y+=movementConstant
+  }
+  else if(e.key=='Meta'){
+    camera.position.y-=movementConstant
+  }
+})
 
 //add an object
 const geometry = new tjs.SphereGeometry(4,64,64);
@@ -79,7 +113,7 @@ let planetBank=[]
 
 //drawing a line
 function drawCircle(x,y,z,radius,faces){
-  const material = new tjs.LineBasicMaterial({color:0xffffff})
+  const material = new tjs.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.2})
   let points=[];
 
   for( let i=0; i<=faces;i++){
@@ -94,32 +128,31 @@ function drawCircle(x,y,z,radius,faces){
 }
 
 
-planetBank.push(new Planet(
-  createPlanetMesh(1.5,64,64,"./planetTexture.png"),
-  0,
-  0.001,
-  50,
-  {x:0,z:0},
-  0.01
-))
+const loadPlanetBank=(planets)=>{
+  let output=[]
+  for(let p in planets){
+    let target=planets[p]
+    output.push(
+      new Planet(
+        createPlanetMesh(
+          target.planetRadius,
+          target.planetHeight,
+          target.planetWidth,
+          target.planetTexture
+        ),
+        target.startingRadian,
+        target.speed,
+        target.orbitalRadius,
+        target.orbiatalCenter,
+        target.rotationSpeed,
+        target.elevation
+      )
+    )
+  }
+  return output
+}
 
-planetBank.push(new Planet(
-  createPlanetMesh(1,64,64,"./planetTexture.png"),
-  0.8,
-  0.005,
-  20,
-  {x:0,z:0},
-  0.001
-))
-planetBank.push(new Planet(
-  createPlanetMesh(1.5,64,64,"./planetTexture.png"),
-  0.8,
-  0.0002,
-  70,
-  {x:0,z:0},
-  0.01,
-  0
-))
+planetBank=loadPlanetBank(planets)
 
 for(let p in planetBank){
   scene.add(planetBank[p].mesh)
@@ -134,11 +167,13 @@ for(let p in planetBank){
 
 function animate(){
   requestAnimationFrame( animate );
+  
   renderer.render( scene, camera)
   controls.update();
-
-  for(let p in planetBank){
-    planetBank[p].update()
+  if(running){
+    for(let p in planetBank){
+      planetBank[p].update()
+    }
   }
 }
 

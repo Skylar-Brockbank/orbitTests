@@ -2,4 +2,15 @@ canvas {
   position:fixed;
   top:0;
   left:0;
+  z-index: 1;
+}
+#controlPanel {
+  position:fixed;
+  bottom:0;
+  left:0;
+  height:12vh;
+  width:20vw;
+  background-color:red;
+  z-index: 2;
+  border-radius: 0vw 2vw 0vw 0vw;
 }
