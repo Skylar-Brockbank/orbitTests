@@ -33,7 +33,6 @@ pause.addEventListener("click",e=>{
 })
 play.addEventListener("click",e=>{
   running=true;
-  animate()
 })
 
 //key controls
